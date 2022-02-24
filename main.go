@@ -1,7 +1,8 @@
 package main
 
 import (
-	"TeachAssistApi/teachassist"
+	"TeachAssistApi/app"
+	"TeachAssistApi/app/teachassist"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -15,13 +16,17 @@ func setupRouter() *gin.Engine {
 	r.POST("login", func(c *gin.Context) {
 		username, password, hasAuth := c.Request.BasicAuth()
 		if !hasAuth {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "no auth"})
+			err := app.CreateError(app.AuthError)
+			c.JSON(http.StatusBadRequest, err.ErrorResponse())
 			return
 		}
 
 		metadata, err := teachassist.LoginUser(username, password)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
+			if e, ok := (err).(app.Error); ok {
+				c.JSON(e.StatusCode, e.ErrorResponse())
+			}
+			return
 		}
 		c.JSON(http.StatusOK, metadata)
 	})

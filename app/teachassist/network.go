@@ -1,6 +1,7 @@
 package teachassist
 
 import (
+	"TeachAssistApi/app"
 	"fmt"
 	"net/http"
 	"strings"
@@ -21,13 +22,13 @@ func loginUser(username, password string) (UserMetadata, error) {
 	req, err := http.NewRequest(method, url, payload)
 
 	if err != nil {
-		return UserMetadata{}, err
+		return UserMetadata{}, app.CreateError(app.NetworkError)
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	res, err := client.Do(req)
 	if err != nil {
-		return UserMetadata{}, err
+		return UserMetadata{}, app.CreateError(app.NetworkError)
 	}
 	defer res.Body.Close()
 
@@ -42,6 +43,11 @@ func loginUser(username, password string) (UserMetadata, error) {
 			sessionExpiry = v.Expires
 		}
 	}
+
+	if studentId == "" || sessionToken == "" || sessionToken == "deleted" {
+		return UserMetadata{}, app.CreateError(app.AuthError)
+	}
+
 	return UserMetadata{
 		Username:      username,
 		Password:      password,
