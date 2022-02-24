@@ -115,7 +115,8 @@ fabric.properties
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -135,5 +136,9 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Environment files
+.env
+.env.local
 
 # End of https://www.toptal.com/developers/gitignore/api/goland,go,macos

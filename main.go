@@ -2,6 +2,7 @@ package main
 
 import (
 	"TeachAssistApi/app"
+	"TeachAssistApi/app/helpers"
 	"TeachAssistApi/app/teachassist"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -35,6 +36,8 @@ func setupRouter() *gin.Engine {
 }
 
 func main() {
+	helpers.LoadEnvironment()
+
 	r := setupRouter()
 	err := r.Run(":8080")
 	if err != nil {
