@@ -2,6 +2,7 @@ package main
 
 import (
 	"TeachAssistApi/app"
+	"TeachAssistApi/app/database"
 	"TeachAssistApi/app/helpers"
 	"TeachAssistApi/app/teachassist"
 	"github.com/gin-gonic/gin"
@@ -37,6 +38,9 @@ func setupRouter() *gin.Engine {
 
 func main() {
 	helpers.LoadEnvironment()
+
+	database.ConnectDatabase()
+	defer database.DisconnectDatabase(database.DB)
 
 	r := setupRouter()
 	err := r.Run(":8080")
