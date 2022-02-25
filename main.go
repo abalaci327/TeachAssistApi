@@ -6,6 +6,7 @@ import (
 	"TeachAssistApi/app/helpers"
 	"TeachAssistApi/app/teachassist"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 )
 
@@ -22,6 +23,8 @@ func setupRouter() *gin.Engine {
 			c.JSON(http.StatusBadRequest, err.ErrorResponse())
 			return
 		}
+		q := c.Request.URL.Query().Get("notifications")
+		notifications := q == "true"
 
 		metadata, err := teachassist.LoginUser(username, password)
 		if err != nil {
@@ -30,6 +33,25 @@ func setupRouter() *gin.Engine {
 			}
 			return
 		}
+
+		user := database.User{
+			Id:            primitive.NewObjectID(),
+			Username:      metadata.Username,
+			Password:      metadata.Password,
+			StudentId:     metadata.StudentId,
+			SessionToken:  metadata.SessionToken,
+			SessionExpiry: metadata.SessionExpiry,
+			Notifications: notifications,
+		}
+
+		err = user.Create(database.DB)
+		if err != nil {
+			if e, ok := (err).(app.Error); ok {
+				c.JSON(e.StatusCode, e.ErrorResponse())
+			}
+			return
+		}
+
 		c.JSON(http.StatusOK, metadata)
 	})
 

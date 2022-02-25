@@ -18,6 +18,7 @@ const (
 	AuthError
 	ParsingError
 	InvalidCourseIdError
+	DatabaseError
 	UnknownError
 )
 
@@ -46,6 +47,12 @@ func CreateError(errorType ErrorType) Error {
 			StatusCode: http.StatusBadRequest,
 			Name:       "Invalid Course Id Error",
 			Message:    "An invalid course id was given.",
+		}
+	case DatabaseError:
+		return Error{
+			StatusCode: http.StatusInternalServerError,
+			Name:       "Database Error",
+			Message:    "An error has occurred while accessing the database.",
 		}
 	case UnknownError:
 		return Error{
