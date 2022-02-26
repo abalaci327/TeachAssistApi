@@ -4,11 +4,16 @@ import (
 	"TeachAssistApi/app"
 	"TeachAssistApi/app/database"
 	"TeachAssistApi/app/helpers"
+	"TeachAssistApi/app/security"
 	"TeachAssistApi/app/teachassist"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 )
+
+type loginResponse struct {
+	Token string `json:"token"`
+}
 
 func setupRouter() *gin.Engine {
 	r := gin.Default()
@@ -52,7 +57,15 @@ func setupRouter() *gin.Engine {
 			return
 		}
 
-		c.JSON(http.StatusOK, metadata)
+		jwt, err := security.CreateJWT(metadata.Username, metadata.StudentId, notifications)
+		if err != nil {
+			if e, ok := (err).(app.Error); ok {
+				c.JSON(e.StatusCode, e.ErrorResponse())
+			}
+			return
+		}
+
+		c.JSON(http.StatusCreated, loginResponse{Token: jwt})
 	})
 
 	return r
