@@ -19,8 +19,11 @@ const (
 	ParsingError
 	InvalidCourseIdError
 	DatabaseError
+	CryptographyError
 	UnknownError
 )
+
+//TODO: Add ability to add detailed error message from throwing call
 
 func CreateError(errorType ErrorType) Error {
 	switch errorType {
@@ -53,6 +56,12 @@ func CreateError(errorType ErrorType) Error {
 			StatusCode: http.StatusInternalServerError,
 			Name:       "Database Error",
 			Message:    "An error has occurred while accessing the database.",
+		}
+	case CryptographyError:
+		return Error{
+			StatusCode: http.StatusInternalServerError,
+			Name:       "Cryptography Error",
+			Message:    "An error has occurred while performing a cryptographic function.",
 		}
 	case UnknownError:
 		return Error{
