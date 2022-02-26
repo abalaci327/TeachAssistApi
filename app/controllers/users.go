@@ -42,3 +42,7 @@ func LoginUser() gin.HandlerFunc {
 		c.JSON(http.StatusCreated, responses.LoginUserResponse{Token: jwt})
 	}
 }
+
+func RenewUserSession() gin.HandlerFunc {
+	return LoginUser()
+}
