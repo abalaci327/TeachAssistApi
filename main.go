@@ -13,6 +13,7 @@ func setupRouter() *gin.Engine {
 
 	api := r.Group("/api/v1")
 	routes.AddUserRoutes(api)
+	routes.AddCoursesRoutes(api)
 
 	return r
 }

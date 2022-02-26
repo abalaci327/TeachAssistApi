@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"TeachAssistApi/app"
+	"TeachAssistApi/app/database"
 	"TeachAssistApi/app/security"
 	"github.com/gin-gonic/gin"
 	"strings"
@@ -41,4 +42,28 @@ func ExtractBearerToken(c *gin.Context) (*security.ParsedToken, error) {
 	parsed := security.VerifyJWT(token)
 
 	return &parsed, nil
+}
+
+func AuthenticateUser(c *gin.Context) *database.User {
+	token, err := ExtractBearerToken(c)
+	if HandleAppError(err, c) {
+		return nil
+	}
+	if !token.Valid {
+		HandleAppError(app.CreateError(app.AuthError), c)
+		return nil
+	}
+
+	user := database.User{Username: token.Username}
+	exists := user.Exists(database.DB)
+	if !exists {
+		HandleAppError(app.CreateError(app.AuthError), c)
+		return nil
+	}
+	err = user.Read(database.DB)
+	if HandleAppError(err, c) {
+		return nil
+	}
+
+	return &user
 }
