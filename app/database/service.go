@@ -30,3 +30,7 @@ func (s *Service) CreateAndUpdateUserIfNecessary(metadata *teachassist.UserMetad
 		return err
 	}
 }
+
+func (s *Service) DeleteUser(u *User) error {
+	return u.Delete(s.DB)
+}

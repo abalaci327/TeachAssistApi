@@ -46,3 +46,26 @@ func LoginUser() gin.HandlerFunc {
 func RenewUserSession() gin.HandlerFunc {
 	return LoginUser()
 }
+
+func RemoveUser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, err := helpers.ExtractBearerToken(c)
+		if helpers.HandleAppError(err, c) {
+			return
+		}
+		if !token.Valid {
+			helpers.HandleAppError(app.CreateError(app.AuthError), c)
+			return
+		}
+
+		user := database.User{Username: token.Username}
+
+		s := database.Service{DB: database.DB}
+		err = s.DeleteUser(&user)
+		if helpers.HandleAppError(err, c) {
+			return
+		}
+
+		c.JSON(200, responses.DeleteUserResponse)
+	}
+}
