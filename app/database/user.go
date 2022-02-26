@@ -38,11 +38,22 @@ func (u *User) Read(db *mongo.Client) error {
 	return nil
 }
 
+func (u *User) Exists(db *mongo.Client) bool {
+	users := db.Database("teachassist").Collection("users")
+	found := users.FindOne(context.TODO(), bson.M{"username": u.Username})
+	var user *User
+	err := found.Decode(&user)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 func (u *User) Update(db *mongo.Client) error {
 	users := db.Database("teachassist").Collection("users")
 	update := bson.M{"username": u.Username, "password": u.Password, "student_id": u.StudentId, "session_token": u.SessionToken, "session_expiry": u.SessionExpiry, "notifications": u.Notifications}
-	err := users.FindOneAndUpdate(context.TODO(), bson.M{"username": u.Username}, bson.M{"$set": update})
-	if err != nil {
+	result := users.FindOneAndUpdate(context.TODO(), bson.M{"username": u.Username}, bson.M{"$set": update})
+	if result.Err() != nil {
 		return app.CreateError(app.DatabaseError)
 	}
 	return nil

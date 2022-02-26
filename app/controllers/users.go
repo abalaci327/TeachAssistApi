@@ -4,10 +4,10 @@ import (
 	"TeachAssistApi/app"
 	"TeachAssistApi/app/controllers/responses"
 	"TeachAssistApi/app/database"
+	"TeachAssistApi/app/helpers"
 	"TeachAssistApi/app/security"
 	"TeachAssistApi/app/teachassist"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 )
 
@@ -16,43 +16,26 @@ func LoginUser() gin.HandlerFunc {
 		username, password, hasAuth := c.Request.BasicAuth()
 		if !hasAuth {
 			err := app.CreateError(app.AuthError)
-			c.JSON(http.StatusBadRequest, err.ErrorResponse())
-			return
+			if helpers.HandleAppError(err, c) {
+				return
+			}
 		}
 		q := c.Request.URL.Query().Get("notifications")
 		notifications := q == "true"
 
 		metadata, err := teachassist.LoginUser(username, password)
-		if err != nil {
-			if e, ok := (err).(app.Error); ok {
-				c.JSON(e.StatusCode, e.ErrorResponse())
-			}
+		if helpers.HandleAppError(err, c) {
 			return
 		}
 
-		user := database.User{
-			Id:            primitive.NewObjectID(),
-			Username:      metadata.Username,
-			Password:      metadata.Password,
-			StudentId:     metadata.StudentId,
-			SessionToken:  metadata.SessionToken,
-			SessionExpiry: metadata.SessionExpiry,
-			Notifications: notifications,
-		}
-
-		err = user.Create(database.DB)
-		if err != nil {
-			if e, ok := (err).(app.Error); ok {
-				c.JSON(e.StatusCode, e.ErrorResponse())
-			}
+		s := database.Service{DB: database.DB}
+		err = s.CreateAndUpdateUserIfNecessary(&metadata, notifications)
+		if helpers.HandleAppError(err, c) {
 			return
 		}
 
 		jwt, err := security.CreateJWT(metadata.Username, metadata.StudentId, notifications)
-		if err != nil {
-			if e, ok := (err).(app.Error); ok {
-				c.JSON(e.StatusCode, e.ErrorResponse())
-			}
+		if helpers.HandleAppError(err, c) {
 			return
 		}
 
