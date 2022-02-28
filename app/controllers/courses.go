@@ -15,7 +15,10 @@ func GetAllCourses() gin.HandlerFunc {
 			return
 		}
 
-		metadata := helpers.UserToUserMetadata(user)
+		metadata, err := helpers.UserToUserMetadata(user)
+		if helpers.HandleAppError(err, c) {
+			return
+		}
 
 		courses, err := teachassist.GetAllCourses(metadata)
 		if helpers.HandleAppError(err, c) {
@@ -33,7 +36,10 @@ func GetCourseByID() gin.HandlerFunc {
 			return
 		}
 
-		metadata := helpers.UserToUserMetadata(user)
+		metadata, err := helpers.UserToUserMetadata(user)
+		if helpers.HandleAppError(err, c) {
+			return
+		}
 
 		id := c.Param("id")
 		if id == "" {

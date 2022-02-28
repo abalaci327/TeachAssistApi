@@ -2,7 +2,9 @@ package database
 
 import (
 	"TeachAssistApi/app"
+	"TeachAssistApi/app/security"
 	"context"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,6 +23,10 @@ type User struct {
 
 func (u *User) Create(db *mongo.Client) error {
 	users := db.Database("teachassist").Collection("users")
+	er := u.encrypt()
+	if er != nil {
+		return er
+	}
 	_, err := users.InsertOne(context.TODO(), u)
 	if err != nil {
 		return app.CreateError(app.DatabaseError)
@@ -51,6 +57,10 @@ func (u *User) Exists(db *mongo.Client) bool {
 
 func (u *User) Update(db *mongo.Client) error {
 	users := db.Database("teachassist").Collection("users")
+	err := u.encrypt()
+	if err != nil {
+		return err
+	}
 	update := bson.M{"username": u.Username, "password": u.Password, "student_id": u.StudentId, "session_token": u.SessionToken, "session_expiry": u.SessionExpiry, "notifications": u.Notifications}
 	result := users.FindOneAndUpdate(context.TODO(), bson.M{"username": u.Username}, bson.M{"$set": update})
 	if result.Err() != nil {
@@ -65,5 +75,27 @@ func (u *User) Delete(db *mongo.Client) error {
 	if err != nil {
 		return app.CreateError(app.DatabaseError)
 	}
+	return nil
+}
+
+func (u *User) encrypt() error {
+	cs, err := security.NewCryptographyService()
+	if err != nil {
+		return err
+	}
+
+	encryptedPassword, err := cs.EncryptToBase64String([]byte(u.Password))
+	if err != nil {
+		return err
+	}
+	encryptedToken, err := cs.EncryptToBase64String([]byte(u.SessionToken))
+	if err != nil {
+		return err
+	}
+
+	u.Password = encryptedPassword
+	u.SessionToken = encryptedToken
+	fmt.Println(cs.DecryptFromBase64String(encryptedPassword))
+	fmt.Println(cs.DecryptFromBase64String(encryptedToken))
 	return nil
 }

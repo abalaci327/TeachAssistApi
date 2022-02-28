@@ -37,16 +37,12 @@ func (cs CryptographyService) Encrypt(plain []byte) (cipher []byte, err error) {
 	return cipher, nil
 }
 
-func (cs CryptographyService) EncryptBase64(plain []byte) ([]byte, error) {
+func (cs CryptographyService) EncryptToBase64String(plain []byte) (string, error) {
 	c, err := cs.Encrypt(plain)
 	if err != nil {
-		return nil, app.CreateError(app.CryptographyError)
+		return "", app.CreateError(app.CryptographyError)
 	}
-
-	base64Cipher := make([]byte, base64.RawStdEncoding.EncodedLen(len(c)))
-	base64.RawStdEncoding.Encode(base64Cipher, c)
-
-	return base64Cipher, nil
+	return base64.RawStdEncoding.EncodeToString(c), nil
 }
 
 func (cs CryptographyService) Decrypt(cipher []byte) ([]byte, error) {
@@ -61,12 +57,16 @@ func (cs CryptographyService) Decrypt(cipher []byte) ([]byte, error) {
 	return plain, nil
 }
 
-func (cs CryptographyService) DecryptBase64(base64Cipher []byte) ([]byte, error) {
-	c := make([]byte, base64.StdEncoding.DecodedLen(len(base64Cipher)))
-	_, err := base64.StdEncoding.Decode(c, base64Cipher)
+func (cs CryptographyService) DecryptFromBase64String(base64Cipher string) (string, error) {
+	c, err := base64.RawStdEncoding.DecodeString(base64Cipher)
 	if err != nil {
-		return nil, app.CreateError(app.CryptographyError)
+		return "", app.CreateError(app.CryptographyError)
 	}
 
-	return cs.Decrypt(c)
+	decrypted, err := cs.Decrypt(c)
+	if err != nil {
+		return "", err
+	}
+
+	return string(decrypted), nil
 }
