@@ -4,7 +4,6 @@ import (
 	"TeachAssistApi/app"
 	"TeachAssistApi/app/security"
 	"context"
-	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -95,7 +94,5 @@ func (u *User) encrypt() error {
 
 	u.Password = encryptedPassword
 	u.SessionToken = encryptedToken
-	fmt.Println(cs.DecryptFromBase64String(encryptedPassword))
-	fmt.Println(cs.DecryptFromBase64String(encryptedToken))
 	return nil
 }
