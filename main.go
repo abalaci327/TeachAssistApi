@@ -4,7 +4,10 @@ import (
 	"TeachAssistApi/app/database"
 	"TeachAssistApi/app/helpers"
 	"TeachAssistApi/app/routes"
+	_ "TeachAssistApi/docs"
 	"github.com/gin-gonic/gin"
+	"github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
 )
 
 func setupRouter() *gin.Engine {
@@ -15,9 +18,20 @@ func setupRouter() *gin.Engine {
 	routes.AddUserRoutes(api)
 	routes.AddCoursesRoutes(api)
 
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	return r
 }
 
+// @title                       TeachAssist API
+// @version                     0.1.0
+// @description                 The fast easy and simple way to access all of your YRDSB course marks.
+// @host                        localhost:8080
+// @BasePath                    /api/v1
+// @securityDefinitions.basic   BasicAuth
+// @securityDefinitions.apikey  BearerAuth
+// @in                          header
+// @name                        Authorization
 func main() {
 	helpers.LoadEnvironment()
 

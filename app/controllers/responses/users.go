@@ -1,9 +1,9 @@
 package responses
 
-import "github.com/gin-gonic/gin"
-
 type LoginUserResponse struct {
-	Token string `json:"token"`
+	Token string `json:"token" example:"jwt"`
 }
 
-var DeleteUserResponse = gin.H{"success": true}
+type DeleteUserResponse struct {
+	Success bool `json:"success" example:"true"`
+}

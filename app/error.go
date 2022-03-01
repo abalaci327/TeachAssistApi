@@ -87,8 +87,8 @@ func (e Error) Error() string {
 }
 
 type ErrorResponse struct {
-	Error   string `json:"error"`
-	Message string `json:"message"`
+	Error   string `json:"error" example:"Error Name"`
+	Message string `json:"message" example:"Error Message"`
 }
 
 func (e Error) ErrorResponse() ErrorResponse {

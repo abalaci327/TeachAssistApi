@@ -1,0 +1,480 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "The fast easy and simple way to access all of your YRDSB course marks.",
+        "title": "TeachAssist API",
+        "contact": {},
+        "version": "0.1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/courses/all": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get metadata about all courses a user is currently enrolled in.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Get All Courses",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.AllCoursesResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/id/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Gets the course with the provided ID including mark weightings and assignments.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Get Course By ID",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.CourseIDResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/login": {
+            "post": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Login a TeachAssist YRDSB user and optionally configure notifications.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Login User",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "Enable Notifications",
+                        "name": "notifications",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.LoginUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/remove": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Remove all user data from the database and revoke JWT Token.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Remove User",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.DeleteUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/renew_session": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Get new JWT Token and resubscribe to notifications.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Renew User Session",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "Enable Notifications",
+                        "name": "notifications",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.LoginUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/app.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "app.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Error Name"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Error Message"
+                }
+            }
+        },
+        "responses.AllCoursesResponse": {
+            "type": "object",
+            "properties": {
+                "metadata": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/teachassist.CourseMetadata"
+                    }
+                }
+            }
+        },
+        "responses.CourseIDResponse": {
+            "type": "object",
+            "properties": {
+                "assessments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/teachassist.Assessment"
+                    }
+                },
+                "weights": {
+                    "$ref": "#/definitions/teachassist.MarkWeights"
+                }
+            }
+        },
+        "responses.DeleteUserResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "responses.LoginUserResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "example": "jwt"
+                }
+            }
+        },
+        "teachassist.Assessment": {
+            "type": "object",
+            "properties": {
+                "application": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/teachassist.Mark"
+                    }
+                },
+                "communication": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/teachassist.Mark"
+                    }
+                },
+                "culminating": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/teachassist.Mark"
+                    }
+                },
+                "knowledge": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/teachassist.Mark"
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Test de compréhension écrite"
+                },
+                "other": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/teachassist.Mark"
+                    }
+                },
+                "thinking": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/teachassist.Mark"
+                    }
+                }
+            }
+        },
+        "teachassist.CourseMetadata": {
+            "type": "object",
+            "properties": {
+                "block": {
+                    "type": "string",
+                    "example": "3"
+                },
+                "code": {
+                    "type": "string",
+                    "example": "FSF4UZ-02"
+                },
+                "current_mark": {
+                    "type": "number",
+                    "example": 0.95
+                },
+                "end_date": {
+                    "type": "string",
+                    "example": "2022-06-30T00:00:00Z"
+                },
+                "final_mark": {
+                    "type": "number",
+                    "example": 0.95
+                },
+                "id": {
+                    "type": "string",
+                    "example": "462052"
+                },
+                "midterm_mark": {
+                    "type": "number",
+                    "example": 0.9
+                },
+                "name": {
+                    "type": "string",
+                    "example": "French"
+                },
+                "room": {
+                    "type": "string",
+                    "example": "215"
+                },
+                "start_date": {
+                    "type": "string",
+                    "example": "2022-02-07T00:00:00Z"
+                }
+            }
+        },
+        "teachassist.Mark": {
+            "type": "object",
+            "properties": {
+                "denominator": {
+                    "type": "number",
+                    "example": 40
+                },
+                "numerator": {
+                    "type": "number",
+                    "example": 39
+                },
+                "weighting": {
+                    "type": "number",
+                    "example": 15
+                }
+            }
+        },
+        "teachassist.MarkWeights": {
+            "type": "object",
+            "properties": {
+                "application": {
+                    "type": "number",
+                    "example": 14
+                },
+                "communication": {
+                    "type": "number",
+                    "example": 14
+                },
+                "culminating": {
+                    "type": "number",
+                    "example": 30
+                },
+                "knowledge": {
+                    "type": "number",
+                    "example": 14
+                },
+                "other": {
+                    "type": "number",
+                    "example": 14
+                },
+                "thinking": {
+                    "type": "number",
+                    "example": 14
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
+        },
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

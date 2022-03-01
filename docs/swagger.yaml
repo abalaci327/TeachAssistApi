@@ -1,0 +1,318 @@
+basePath: /api/v1
+definitions:
+  app.ErrorResponse:
+    properties:
+      error:
+        example: Error Name
+        type: string
+      message:
+        example: Error Message
+        type: string
+    type: object
+  responses.AllCoursesResponse:
+    properties:
+      metadata:
+        items:
+          $ref: '#/definitions/teachassist.CourseMetadata'
+        type: array
+    type: object
+  responses.CourseIDResponse:
+    properties:
+      assessments:
+        items:
+          $ref: '#/definitions/teachassist.Assessment'
+        type: array
+      weights:
+        $ref: '#/definitions/teachassist.MarkWeights'
+    type: object
+  responses.DeleteUserResponse:
+    properties:
+      success:
+        example: true
+        type: boolean
+    type: object
+  responses.LoginUserResponse:
+    properties:
+      token:
+        example: jwt
+        type: string
+    type: object
+  teachassist.Assessment:
+    properties:
+      application:
+        items:
+          $ref: '#/definitions/teachassist.Mark'
+        type: array
+      communication:
+        items:
+          $ref: '#/definitions/teachassist.Mark'
+        type: array
+      culminating:
+        items:
+          $ref: '#/definitions/teachassist.Mark'
+        type: array
+      knowledge:
+        items:
+          $ref: '#/definitions/teachassist.Mark'
+        type: array
+      name:
+        example: Test de compréhension écrite
+        type: string
+      other:
+        items:
+          $ref: '#/definitions/teachassist.Mark'
+        type: array
+      thinking:
+        items:
+          $ref: '#/definitions/teachassist.Mark'
+        type: array
+    type: object
+  teachassist.CourseMetadata:
+    properties:
+      block:
+        example: "3"
+        type: string
+      code:
+        example: FSF4UZ-02
+        type: string
+      current_mark:
+        example: 0.95
+        type: number
+      end_date:
+        example: "2022-06-30T00:00:00Z"
+        type: string
+      final_mark:
+        example: 0.95
+        type: number
+      id:
+        example: "462052"
+        type: string
+      midterm_mark:
+        example: 0.9
+        type: number
+      name:
+        example: French
+        type: string
+      room:
+        example: "215"
+        type: string
+      start_date:
+        example: "2022-02-07T00:00:00Z"
+        type: string
+    type: object
+  teachassist.Mark:
+    properties:
+      denominator:
+        example: 40
+        type: number
+      numerator:
+        example: 39
+        type: number
+      weighting:
+        example: 15
+        type: number
+    type: object
+  teachassist.MarkWeights:
+    properties:
+      application:
+        example: 14
+        type: number
+      communication:
+        example: 14
+        type: number
+      culminating:
+        example: 30
+        type: number
+      knowledge:
+        example: 14
+        type: number
+      other:
+        example: 14
+        type: number
+      thinking:
+        example: 14
+        type: number
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: The fast easy and simple way to access all of your YRDSB course marks.
+  title: TeachAssist API
+  version: 0.1.0
+paths:
+  /courses/all:
+    get:
+      description: Get metadata about all courses a user is currently enrolled in.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.AllCoursesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get All Courses
+      tags:
+      - Courses
+  /courses/id/{id}:
+    get:
+      description: Gets the course with the provided ID including mark weightings
+        and assignments.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.CourseIDResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Course By ID
+      tags:
+      - Courses
+  /users/login:
+    post:
+      description: Login a TeachAssist YRDSB user and optionally configure notifications.
+      parameters:
+      - description: Enable Notifications
+        in: query
+        name: notifications
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.LoginUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Login User
+      tags:
+      - Users
+  /users/remove:
+    delete:
+      description: Remove all user data from the database and revoke JWT Token.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.DeleteUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Remove User
+      tags:
+      - Users
+  /users/renew_session:
+    get:
+      description: Get new JWT Token and resubscribe to notifications.
+      parameters:
+      - description: Enable Notifications
+        in: path
+        name: notifications
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.LoginUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/app.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Renew User Session
+      tags:
+      - Users
+securityDefinitions:
+  BasicAuth:
+    type: basic
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

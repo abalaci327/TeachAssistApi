@@ -11,6 +11,19 @@ import (
 	"net/http"
 )
 
+// LoginUser godoc
+// @Summary      Login User
+// @Description  Login a TeachAssist YRDSB user and optionally configure notifications.
+// @Tags         Users
+// @Produce      json
+// @Param        notifications  query     bool  true  "Enable Notifications"
+// @Success      200            {object}  responses.LoginUserResponse
+// @Failure      400            {object}  app.ErrorResponse
+// @Failure      401            {object}  app.ErrorResponse
+// @Failure      500            {object}  app.ErrorResponse
+// @Failure      502            {object}  app.ErrorResponse
+// @Router       /users/login [post]
+// @Security     BasicAuth
 func LoginUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		username, password, hasAuth := c.Request.BasicAuth()
@@ -43,10 +56,35 @@ func LoginUser() gin.HandlerFunc {
 	}
 }
 
+// RenewUserSession godoc
+// @Summary      Renew User Session
+// @Description  Get new JWT Token and resubscribe to notifications.
+// @Tags         Users
+// @Produce      json
+// @Param        notifications  path      bool  true  "Enable Notifications"
+// @Success      200            {object}  responses.LoginUserResponse
+// @Failure      400            {object}  app.ErrorResponse
+// @Failure      401            {object}  app.ErrorResponse
+// @Failure      500            {object}  app.ErrorResponse
+// @Failure      502            {object}  app.ErrorResponse
+// @Router       /users/renew_session [get]
+// @Security     BasicAuth
 func RenewUserSession() gin.HandlerFunc {
 	return LoginUser()
 }
 
+// RemoveUser godoc
+// @Summary      Remove User
+// @Description  Remove all user data from the database and revoke JWT Token.
+// @Tags         Users
+// @Produce      json
+// @Success      200  {object}  responses.DeleteUserResponse
+// @Failure      400  {object}  app.ErrorResponse
+// @Failure      401  {object}  app.ErrorResponse
+// @Failure      500  {object}  app.ErrorResponse
+// @Failure      502  {object}  app.ErrorResponse
+// @Router       /users/remove [delete]
+// @Security     BearerAuth
 func RemoveUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := helpers.ExtractBearerToken(c)
@@ -66,6 +104,6 @@ func RemoveUser() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(200, responses.DeleteUserResponse)
+		c.JSON(200, responses.DeleteUserResponse{Success: true})
 	}
 }
